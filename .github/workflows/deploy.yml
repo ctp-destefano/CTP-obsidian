@@ -1,3 +1,4 @@
+
 name: Deploy Quartz to GitHub Pages
 
 on:
@@ -22,19 +23,27 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
+
       - run: npm ci
-            - name: Importar notas de Obsidian
+
+      - run: npx quartz plugin install
+
+      - name: Importar notas de Obsidian
         run: |
           git clone --depth 1 https://github.com/ctp-destefano/CTP-Vault.git /tmp/ctp-vault
+          mkdir -p content
           find content -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
           cp -a /tmp/ctp-vault/. content/
           rm -rf content/.git
-      - run: npx quartz plugin install
+          find content -name '.obsidian' -type d -prune -exec rm -rf -- {} +
+
       - run: npx quartz build
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: public
@@ -48,4 +57,3 @@ jobs:
     steps:
       - uses: actions/deploy-pages@v4
         id: deployment
-        
