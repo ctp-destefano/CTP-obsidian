@@ -1,3 +1,4 @@
+
 name: Deploy Quartz to GitHub Pages
 
 on:
@@ -36,6 +37,16 @@ jobs:
 
       - name: Install Quartz plugins
         run: npx quartz plugin install
+
+      - name: Save Quartz homepage
+        run: |
+          if [ ! -f content/index.md ]; then
+            echo "ERROR: Original homepage not found"
+            exit 1
+          fi
+
+          cp content/index.md /tmp/quartz-home.md
+          echo "Homepage saved"
 
       - name: Import Obsidian notes
         run: |
@@ -90,8 +101,26 @@ jobs:
           print(f"Prepared {converted} Excalidraw drawing(s)")
           PY
 
+      - name: Restore Quartz homepage
+        run: |
+          if [ ! -f content/index.md ]; then
+            cp /tmp/quartz-home.md content/index.md
+            echo "Homepage restored"
+          else
+            echo "Using homepage from Obsidian vault"
+          fi
+
       - name: Build Quartz
         run: npx quartz build
+
+      - name: Verify homepage
+        run: |
+          if [ ! -f public/index.html ]; then
+            echo "ERROR: public/index.html is missing"
+            exit 1
+          fi
+
+          echo "Homepage generated successfully"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
