@@ -20,31 +20,38 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Quartz
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-      - run: npx quartz plugin install
+      - name: Install Quartz plugins
+        run: npx quartz plugin install
 
-      - name: Importar notas de Obsidian
+      - name: Import Obsidian notes
         run: |
           git clone --depth 1 https://github.com/ctp-destefano/CTP-Vault.git /tmp/ctp-vault
           mkdir -p content
           find content -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
           cp -a /tmp/ctp-vault/. content/
           rm -rf content/.git
-          find content -name '.obsidian' -type d -prune -exec rm -rf -- {} +
+          find content -type d -name '.obsidian' -prune -exec rm -rf -- {} +
+          find content -type d -name '.trash' -prune -exec rm -rf -- {} +
 
-      - run: npx quartz build
+      - name: Build Quartz
+        run: npx quartz build
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: public
 
@@ -55,5 +62,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
         id: deployment
+        uses: actions/deploy-pages@v4
