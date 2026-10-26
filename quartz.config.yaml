@@ -7,7 +7,7 @@ configuration:
   analytics:
     provider: plausible
   locale: en-US
-  baseUrl: ctp-destefano.github.io/CTP_Obsidian
+  baseUrl: "ctp-destefano.github.io/CTP-obsidian",
   ignorePatterns:
     - private
     - templates
