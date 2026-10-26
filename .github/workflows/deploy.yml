@@ -19,6 +19,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Quartz
         uses: actions/checkout@v4
@@ -37,18 +38,89 @@ jobs:
       - name: Install Quartz plugins
         run: npx quartz plugin install
 
+      - name: Save Quartz homepage
+        run: |
+          if [ ! -f content/index.md ]; then
+            echo "ERROR: content/index.md does not exist"
+            exit 1
+          fi
+
+          cp content/index.md /tmp/quartz-home.md
+          echo "Quartz homepage saved"
+
       - name: Import Obsidian notes
         run: |
           git clone --depth 1 https://github.com/ctp-destefano/CTP-Vault.git /tmp/ctp-vault
+
           mkdir -p content
           find content -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+
           cp -a /tmp/ctp-vault/. content/
           rm -rf content/.git
+
           find content -type d -name '.obsidian' -prune -exec rm -rf -- {} +
           find content -type d -name '.trash' -prune -exec rm -rf -- {} +
 
+      - name: Prepare Excalidraw drawings
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path("content")
+          converted = 0
+
+          for path in sorted(root.rglob("*.md")):
+              if path.name.lower().endswith(".excalidraw.md"):
+                  continue
+
+              content = path.read_text(encoding="utf-8-sig")
+
+              if not re.search(
+                  r"(?m)^excalidraw-plugin:\s*parsed\s*$",
+                  content
+              ):
+                  continue
+
+              if "# Excalidraw Data" not in content:
+                  continue
+
+              target = path.with_name(
+                  path.name[:-3] + ".excalidraw.md"
+              )
+
+              if target.exists():
+                  print(f"Skipping: {target} already exists")
+                  continue
+
+              path.rename(target)
+              converted += 1
+
+              print(f"Excalidraw: {path.name} -> {target.name}")
+
+          print(f"Prepared {converted} Excalidraw drawing(s)")
+          PY
+
+      - name: Restore Quartz homepage
+        run: |
+          if [ ! -f content/index.md ]; then
+            cp /tmp/quartz-home.md content/index.md
+            echo "Quartz homepage restored"
+          else
+            echo "Vault homepage found; keeping it"
+          fi
+
       - name: Build Quartz
         run: npx quartz build
+
+      - name: Verify homepage
+        run: |
+          if [ ! -f public/index.html ]; then
+            echo "ERROR: Homepage was not generated"
+            exit 1
+          fi
+
+          echo "Homepage generated successfully"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -58,9 +130,11 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
