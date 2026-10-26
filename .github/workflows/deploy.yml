@@ -27,6 +27,12 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+            - name: Importar notas de Obsidian
+        run: |
+          git clone --depth 1 https://github.com/ctp-destefano/CTP-Vault.git /tmp/ctp-vault
+          find content -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+          cp -a /tmp/ctp-vault/. content/
+          rm -rf content/.git
       - run: npx quartz plugin install
       - run: npx quartz build
       - uses: actions/upload-pages-artifact@v3
