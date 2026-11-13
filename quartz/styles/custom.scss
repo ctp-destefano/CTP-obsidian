@@ -1,3 +1,162 @@
 @use "./variables.scss" as *;
 
-// put your custom CSS here!
+// CTP Biblioteca — custom appearance for Quartz 5.
+// Styling only: Obsidian notes and publishing automation remain unchanged.
+:root {
+  --ctp-radius: 12px;
+  --ctp-radius-lg: 18px;
+  --ctp-accent: #ffd52e;
+}
+
+body {
+  letter-spacing: -0.008em;
+}
+
+.page {
+  max-width: 1600px;
+}
+
+.page > #quartz-body {
+  column-gap: clamp(1rem, 2vw, 2rem);
+}
+
+.page > #quartz-body .sidebar {
+  padding-top: 2.5rem;
+}
+
+.sidebar.left {
+  border-right: 1px solid var(--lightgray);
+}
+
+.sidebar.right {
+  border-left: 1px solid var(--lightgray);
+}
+
+.page-title,
+.page-title a,
+.page-title a.internal {
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  color: var(--dark);
+}
+
+.page-title a:hover {
+  color: var(--secondary);
+}
+
+article {
+  line-height: 1.75;
+}
+
+article h1,
+article h2,
+article h3 {
+  letter-spacing: -0.03em;
+}
+
+article h1 {
+  font-weight: 750;
+}
+
+article h2 {
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--lightgray);
+}
+
+article a.internal {
+  border-radius: 6px;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+button,
+input[type="search"],
+.search,
+.search-button,
+.search-container {
+  border-radius: var(--ctp-radius);
+}
+
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 3px;
+}
+
+.explorer,
+.toc,
+.backlinks,
+.graph,
+.search,
+.recent-notes {
+  font-size: 0.94rem;
+}
+
+.explorer {
+  overflow-wrap: anywhere;
+}
+
+.explorer .folder-container,
+.explorer .folder-outer,
+.explorer li {
+  border-radius: 8px;
+}
+
+.explorer a:hover,
+.explorer button:hover,
+.toc a:hover {
+  color: var(--secondary);
+}
+
+article blockquote,
+article .callout {
+  border-radius: var(--ctp-radius);
+}
+
+article blockquote {
+  background: var(--highlight);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+pre,
+figure[data-rehype-pretty-code-figure] > pre {
+  border-radius: var(--ctp-radius);
+}
+
+article img {
+  border-radius: var(--ctp-radius);
+}
+
+.table-container {
+  border: 1px solid var(--lightgray);
+  border-radius: var(--ctp-radius);
+}
+
+.table-container > table {
+  margin: 0;
+  width: 100%;
+}
+
+footer {
+  border-top: 1px solid var(--lightgray);
+  padding-top: 1rem;
+  margin-top: 3rem;
+}
+
+@media all and ($mobile) {
+  .sidebar.left,
+  .sidebar.right {
+    border: 0;
+  }
+
+  .page > #quartz-body .sidebar {
+    padding-top: 1rem;
+  }
+}
