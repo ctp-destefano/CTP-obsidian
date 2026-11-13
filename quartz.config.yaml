@@ -127,7 +127,7 @@ plugins:
     enabled: true
 
   - source: "@quartz-themes/core"
-    enabled: true
+    enabled: false
     options:
       theme: default
       mode: both
